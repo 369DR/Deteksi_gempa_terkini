@@ -1,7 +1,6 @@
 import requests
 import bs4
 
-
 def ekstrasi_data():
     """
     Tanggal     : 18 Maret 2023,
