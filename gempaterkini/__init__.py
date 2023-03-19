@@ -1,8 +1,6 @@
 import requests
 import bs4
 
-
-
 def ekstrasi_data():
     """
     Tanggal     : 18 Maret 2023,
@@ -10,15 +8,17 @@ def ekstrasi_data():
     Magnitudo   : 5.1
     Kedalaman   : 91 km
     Lokasi      : Pusat gempa berada di darat 6 km barat daya Kota Jayapura
-    Dirasakan   : tidak berpotensi TSUNAMI
+    Dirasakan   : Dirasakan (Skala MMI): II - III Kota Jayapura
     :return:
     """
     try:
         content = requests.get("https://bmkg.go.id")
     except Exception:
         return None
+
     if content.status_code == 200:
         soup = bs4.BeautifulSoup(content.text, "html.parser")
+
         result = soup.find("span", {"class":"waktu"})
         result = result.text.split(', ')
         tanggal = result[0]
