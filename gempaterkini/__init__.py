@@ -9,9 +9,8 @@ def ekstrasi_data():
     waktu       : 02:38:00 WIB
     Magnitudo   : 5.1
     Kedalaman   : 91 km
-    Lokasi      : LS=5.90  BT=125.99
-    Pusat Gempa : 224 km BaratLaut MELONGUANE-SULUT
-    keterangan  : tidak berpotensi TSUNAMI
+    Lokasi      : Pusat gempa berada di darat 6 km barat daya Kota Jayapura
+    Dirasakan   : tidak berpotensi TSUNAMI
     :return:
     """
     try:
@@ -19,18 +18,45 @@ def ekstrasi_data():
     except Exception:
         return None
     if content.status_code == 200:
-        print(content.text)
-        # soup = bs4.BeautifulSoup(content)
-        # print(soup.prettify())
+        soup = bs4.BeautifulSoup(content.text, "html.parser")
+        result = soup.find("span", {"class":"waktu"})
+        result = result.text.split(', ')
+        tanggal = result[0]
+        waktu = result[1]
+
+        result = soup.find("div",{"class":"col-md-6 col-xs-6 gempabumi-detail no-padding"})
+        result = result.findChildren ("li")
+        i = 0
+        magnitudo = None
+        kedalaman = None
+        ls = None
+        bt= None
+        lokasi = None
+        dirasakan = None
+
+        for res in result:
+            if i == 1:
+                magnitudo = res.text
+            elif i == 2:
+                kedalaman = res.text
+            elif i == 3:
+                koordinat = res.text.split('- ')
+                ls = koordinat[0]
+                bt = koordinat[1]
+            elif i == 4:
+                lokasi = res.text
+            elif i  == 5:
+                dirasakan = res.text
+            i = i + 1
 
         hasil = dict ()
-        hasil["tanggal"] = "18 Maret 2023"
-        hasil["waktu"] = "02:38:00 WIB"
-        hasil["magnitudo"] = 5.1
-        hasil["kedalaman"] = "91 km"
-        hasil["lokasi"] = {'ls':5.90, 'bt':125.99}
-        hasil["pusat gempa"] = "224 km BaratLaut MELONGUANE-SULUT"
-        hasil["keterangan"] = "tidak berpotensi TSUNAMI"
+        hasil["tanggal"] = tanggal
+        hasil["waktu"] = waktu
+        hasil["magnitudo"] = magnitudo
+        hasil["kedalaman"] = kedalaman
+        hasil["koordinat"] = {'ls':ls, 'bt':bt}
+        hasil["lokasi"] = lokasi
+        hasil["dirasakan"] =dirasakan
         return  hasil
     else:
         return  None
@@ -43,9 +69,9 @@ def tampilkan_data(result):
     print(f"waktu,{result['waktu']}")
     print(f"magnitudo,{result['magnitudo']}")
     print(f"kedalaman,{result['kedalaman']}")
-    print(f"lokasi: LS={result['lokasi']['ls']}, BT={result['lokasi']['bt']}")
-    print(f"pusat gempa,{result['pusat gempa']}")
-    print(f"keterangan,{result['keterangan']}")
+    print(f"lokasi,{result['lokasi']}")
+    print(f"koordinat: LS={result['koordinat']['ls']}, BT={result['koordinat']['bt']}")
+    print(f"dirasakan,{result['dirasakan']}")
 
 if __name__ == '__main__':
     print("ini adalah pckage gempa terkini")
